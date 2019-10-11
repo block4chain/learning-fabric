@@ -40,7 +40,7 @@ type commImpl struct {
 	secureDialOpts func() []grpc.DialOption
 	connStore      *connectionStore
 	PKIID          []byte
-	deadEndpoints  chan common.PKIidType
+	deadEndpoints  chan common.PKIidType  //包含所有已经断连的节点，默认缓冲大小为100
 	msgPublisher   *ChannelDeMultiplexer   //消息广播分发器
 	lock           *sync.Mutex
 	exitChan       chan struct{}
@@ -112,17 +112,21 @@ func (c *commImpl) Ping(context.Context, *proto.Empty) (*proto.Empty, error) {
 
 ```go
 func (c *commImpl) SetDialOpts(opts ...grpc.DialOption)
-//给远端节点发送消息
+//向远端节点发送消息
 func (c *commImpl) Send(msg *proto.SignedGossipMessage, peers ...*RemotePeer)
+//向远端节点发送消息，并等待ACK
+func (c *commImpl) SendWithAck(msg *proto.SignedGossipMessage, timeout time.Duration, minAck int, peers ...*RemotePeer) AggregatedSendResult
+//向远端节点发送一个Ping包探活
 func (c *commImpl) Probe(remotePeer *RemotePeer) error
+//与远端节点启动握手流程
 func (c *commImpl) Handshake(remotePeer *RemotePeer) (api.PeerIdentityType, error)
 //向通信层注册接收感兴趣的消息
 func (c *commImpl) Accept(acceptor common.MessageAcceptor) <-chan proto.ReceivedMessage
+//返回包含所有断连节点的通道
 func (c *commImpl) PresumedDead() <-chan common.PKIidType
 func (c *commImpl) CloseConn(peer *RemotePeer)
 func (c *commImpl) Stop() 
 func (c *commImpl) GetPKIid() common.PKIidType
-func (c *commImpl) SendWithAck(msg *proto.SignedGossipMessage, timeout time.Duration, minAck int, peers ...*RemotePeer) AggregatedSendResult
 ```
 
 ## 连接握手
@@ -774,5 +778,152 @@ func (c *commImpl) Accept(acceptor common.MessageAcceptor) <-chan proto.Received
 
 Accept方法会启动一个goroutine处理ChannelDeMultiplexer通道里的消息并将消息转换成`ReceivedMessage`结构重新发布。
 
+## 消息发送
 
+通信层提供消息Send方法和SendWithAck方法，方便上层应用不用关心具体的连接进行消息的发送。
+
+### `Send`方法
+
+```go
+func (c *commImpl) Send(msg *proto.SignedGossipMessage, peers ...*RemotePeer) {
+	if c.isStopping() || len(peers) == 0 {
+		return
+	}
+	for _, peer := range peers {
+		//为每个peer启动一个goroutine发送消息
+		go func(peer *RemotePeer, msg *proto.SignedGossipMessage) {
+			c.sendToEndpoint(peer, msg, nonBlockingSend)
+		}(peer, msg)
+	}
+}
+
+func (c *commImpl) sendToEndpoint(peer *RemotePeer, msg *proto.SignedGossipMessage, shouldBlock blockingBehavior) {
+	if c.isStopping() {
+		return
+	}
+	var err error
+
+	conn, err := c.connStore.getConnection(peer)  //获取远端节点的连接
+	if err == nil {
+		disConnectOnErr := func(err error) {
+			//发送失败，断开该连接
+			c.disconnect(peer.PKIID)
+		}
+		conn.send(msg, disConnectOnErr, shouldBlock)  //调用连接发送消息
+		return
+	}
+	c.disconnect(peer.PKIID)  //获取连接失败，断开与该节点的连接
+}
+```
+
+### `SendWithAck`方法
+
+SendWithAck方法与Send方法的差别在于前者需要等待远端的ACK消息，后者不需要。
+
+```go
+func (c *commImpl) SendWithAck(msg *proto.SignedGossipMessage, timeout time.Duration, minAck int, peers ...*RemotePeer) AggregatedSendResult {
+	if len(peers) == 0 {
+		return nil
+	}
+	var err error
+	msg.Nonce = util.RandomUInt64()  //为这条消息生成一个随机Nonce
+	msg, err = msg.NoopSign()
+	if c.isStopping() || err != nil {
+		if err == nil {
+			err = errors.New("comm is stopping")
+		}
+		results := []SendResult{}
+		for _, p := range peers {
+			results = append(results, SendResult{
+				error:      err,
+				RemotePeer: *p,
+			})
+		}
+		return results
+	}
+
+	sndFunc := func(peer *RemotePeer, msg *proto.SignedGossipMessage) {
+		c.sendToEndpoint(peer, msg, blockingSend)
+	}
+	subscriptions := make(map[string]func() error)
+	for _, p := range peers {
+		topic := topicForAck(msg.Nonce, p.PKIID)   //消息ack主题: "{nonce} {pkiid}"
+		sub := c.pubSub.Subscribe(topic, timeout) //按主题订阅消息
+		subscriptions[string(p.PKIID)] = func() error {
+			msg, err := sub.Listen()
+			if err != nil {
+				return err
+			}
+			if msg, isAck := msg.(*proto.Acknowledgement); !isAck {
+				return fmt.Errorf("Received a message of type %s, expected *proto.Acknowledgement", reflect.TypeOf(msg))
+			} else {
+				if msg.Error != "" {
+					return errors.New(msg.Error)
+				}
+			}
+			return nil
+		}
+	}
+	waitForAck := func(p *RemotePeer) error {
+		return subscriptions[string(p.PKIID)]()
+	}
+	ackOperation := newAckSendOperation(sndFunc, waitForAck)
+	return ackOperation.send(msg, minAck, peers...)
+}
+```
+
+方法将操作委托给结构`comm.ackSendOperation`
+
+{% code-tabs %}
+{% code-tabs-item title="gossip/comm/ack.go" %}
+```go
+type sendFunc func(peer *RemotePeer, msg *proto.SignedGossipMessage)
+type waitFunc func(*RemotePeer) error
+
+type ackSendOperation struct {
+	snd        sendFunc
+	waitForAck waitFunc
+}
+```
+{% endcode-tabs-item %}
+{% endcode-tabs %}
+
+并执行结构实例的send方法
+
+```go
+func (aso *ackSendOperation) send(msg *proto.SignedGossipMessage, minAckNum int, peers ...*RemotePeer) []SendResult {
+	successAcks := 0
+	results := []SendResult{}
+
+	acks := make(chan SendResult, len(peers))
+	// Send to all peers the message
+	for _, p := range peers {
+		//为每个Peer生成一个goroutine处理
+		go func(p *RemotePeer) {
+			// Send the message to 'p'
+			aso.snd(p, msg)  //发送请求
+			// Wait for an ack from 'p', or get an error if timed out
+			err := aso.waitForAck(p)  //等待响应
+			acks <- SendResult{
+				RemotePeer: *p,
+				error:      err,
+			}
+		}(p)
+	}
+	for {
+		ack := <-acks
+		results = append(results, SendResult{
+			error:      ack.error,
+			RemotePeer: ack.RemotePeer,
+		})
+		if ack.error == nil {
+			successAcks++
+		}
+		if successAcks == minAckNum || len(results) == len(peers) {
+			break
+		}
+	}
+	return results
+}
+```
 
