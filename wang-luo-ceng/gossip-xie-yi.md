@@ -177,6 +177,27 @@ func (m *SignedGossipMessage) Sign(signer Signer) (*Envelope, error) {
 
 消息协议提供了一个通用的协议结构，为满足不同的应用场景，消息的负载数据Content类型是不定的。
 
+### ACK消息
+
+ACK消息用于对接收到的消息进行确认回复
+
+{% code-tabs %}
+{% code-tabs-item title="protos/gossip/message.pb.go" %}
+```go
+type GossipMessage_Ack struct {
+	Ack *Acknowledgement `protobuf:"bytes,22,opt,name=ack,proto3,oneof"`
+}
+
+type Acknowledgement struct {
+	Error                string   `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+```
+{% endcode-tabs-item %}
+{% endcode-tabs %}
+
 ### 连接建立消息
 
 连接建立消息用于在节点间建立Gossip点对点连接
