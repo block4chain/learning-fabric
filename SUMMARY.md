@@ -27,8 +27,9 @@
 
 ## 网络层
 
-* [Gossip协议](wang-luo-ceng/gossip-xie-yi.md)
+* [协议](wang-luo-ceng/gossip-xie-yi.md)
 * [通信层](wang-luo-ceng/untitled.md)
+* [服务层](wang-luo-ceng/fu-wu-ceng.md)
 
 ## 性能优化
 

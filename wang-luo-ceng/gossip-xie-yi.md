@@ -2,7 +2,7 @@
 description: Gossip节点间完成数据通信的数据协议
 ---
 
-# Gossip协议
+# 协议
 
 ## 消息协议
 
