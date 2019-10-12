@@ -4,5 +4,7 @@ description: 本文先介绍fabric的软件架构，让读者先从宏观上了�
 
 # fabric的软件架构
 
+
+
 ![](../.gitbook/assets/securedchaincode-fabric-arch.png)
 
