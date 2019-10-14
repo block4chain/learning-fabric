@@ -22,6 +22,29 @@ type GossipServer interface {
 {% endcode-tabs-item %}
 {% endcode-tabs %}
 
+同时通信层提供一个抽象接口方便上层应用使用
+
+```go
+type Comm interface {
+	GetPKIid() common.PKIidType  //返回当前节点的PKIID
+	Send(msg *proto.SignedGossipMessage, peers ...*RemotePeer) //向其它节点发送消息
+	//向其它节点发送消息并等待ack
+	SendWithAck(msg *proto.SignedGossipMessage, timeout time.Duration, minAck int, peers ...*RemotePeer) AggregatedSendResult
+	//探活远端节点
+	Probe(peer *RemotePeer) error
+	//发起握手
+	Handshake(peer *RemotePeer) (api.PeerIdentityType, error)
+	//注册订阅感兴趣的消息
+	Accept(common.MessageAcceptor) <-chan proto.ReceivedMessage
+	//监听已经断开的连接
+	PresumedDead() <-chan common.PKIidType
+	//关闭到指定远端的连接
+	CloseConn(peer *RemotePeer)
+	//关闭通信层
+	Stop()
+}
+```
+
 ## 服务实现
 
 `comm.commImpl`是通信层服务的实现

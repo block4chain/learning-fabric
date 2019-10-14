@@ -10,25 +10,42 @@ description: 服务层实现Gossip协议，并为上层提供节点发现、数�
 {% code-tabs-item title="gossip/gossip/gossip.go" %}
 ```go
 type Gossip interface {
-	SelfMembershipInfo() discovery.NetworkMember
+	//channel相关
+	JoinChan(joinMsg api.JoinChannelMessage, chainID common.ChainID).
+	LeaveChan(chainID common.ChainID)
 	SelfChannelInfo(common.ChainID) *proto.SignedGossipMessage
-	Send(msg *proto.GossipMessage, peers ...*comm.RemotePeer)
-	SendByCriteria(*proto.SignedGossipMessage, SendCriteria) error
+	UpdateLedgerHeight(height uint64, chainID common.ChainID)
+	UpdateChaincodes(chaincode []*proto.Chaincode, chainID common.ChainID)
+	PeerFilter(channel common.ChainID, messagePredicate api.SubChannelSelectionCriteria) (filter.RoutingFilter, error)
+	
+	//member相关
+	SelfMembershipInfo() discovery.NetworkMember
 	Peers() []discovery.NetworkMember
 	PeersOfChannel(common.ChainID) []discovery.NetworkMember
 	UpdateMetadata(metadata []byte)
-	UpdateLedgerHeight(height uint64, chainID common.ChainID)
-	UpdateChaincodes(chaincode []*proto.Chaincode, chainID common.ChainID)
-	Gossip(msg *proto.GossipMessage)
-	PeerFilter(channel common.ChainID, messagePredicate api.SubChannelSelectionCriteria) (filter.RoutingFilter, error)
-	Accept(acceptor common.MessageAcceptor, passThrough bool) (<-chan *proto.GossipMessage, <-chan proto.ReceivedMessage)
-	JoinChan(joinMsg api.JoinChannelMessage, chainID common.ChainID).
-	LeaveChan(chainID common.ChainID)
 	SuspectPeers(s api.PeerSuspector)
 	IdentityInfo() api.PeerIdentitySet
+	
+	//消息
+	Send(msg *proto.GossipMessage, peers ...*comm.RemotePeer)
+	SendByCriteria(*proto.SignedGossipMessage, SendCriteria) error
+	Gossip(msg *proto.GossipMessage)
+	
+	//其它
+	Accept(acceptor common.MessageAcceptor, passThrough bool) (<-chan *proto.GossipMessage, <-chan proto.ReceivedMessage)
 	Stop()
 }
 ```
 {% endcode-tabs-item %}
 {% endcode-tabs %}
+
+## 服务实现
+
+## 通道消息
+
+## 领导选举
+
+## 状态同步
+
+
 

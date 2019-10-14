@@ -220,3 +220,84 @@ type ConnEstablish struct {
 {% endcode-tabs-item %}
 {% endcode-tabs %}
 
+### 节点状态消息
+
+节点状态消息用于向网络其它节点发布自己的状态:
+
+* 帐本区块高度
+* 是否离开通道
+* 安装的链码集合
+
+{% code-tabs %}
+{% code-tabs-item title="protos/gossip/message.pb.go" %}
+```go
+type GossipMessage_StateInfo struct {
+	StateInfo *StateInfo `protobuf:"bytes,15,opt,name=state_info,json=stateInfo,proto3,oneof"`
+}
+type StateInfo struct {
+	Timestamp *PeerTime `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	PkiId     []byte    `protobuf:"bytes,3,opt,name=pki_id,json=pkiId,proto3" json:"pki_id,omitempty"`
+	Channel_MAC          []byte      `protobuf:"bytes,4,opt,name=channel_MAC,json=channelMAC,proto3" json:"channel_MAC,omitempty"`
+	Properties           *Properties `protobuf:"bytes,5,opt,name=properties,proto3" json:"properties,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
+}
+//状态属性
+type Properties struct {
+	LedgerHeight         uint64       `protobuf:"varint,1,opt,name=ledger_height,json=ledgerHeight,proto3" json:"ledger_height,omitempty"`
+	LeftChannel          bool         `protobuf:"varint,2,opt,name=left_channel,json=leftChannel,proto3" json:"left_channel,omitempty"`
+	Chaincodes           []*Chaincode `protobuf:"bytes,3,rep,name=chaincodes,proto3" json:"chaincodes,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
+}
+```
+{% endcode-tabs-item %}
+{% endcode-tabs %}
+
+### 节点状态信息集合消息
+
+节点通过这个消息向通道内其它节点广播自己从网络上学习到的其它节点的状态信息集合
+
+{% code-tabs %}
+{% code-tabs-item title="protos/gossip/message.pb.go" %}
+```go
+type GossipMessage_StateSnapshot struct {
+	StateSnapshot *StateInfoSnapshot `protobuf:"bytes,16,opt,name=state_snapshot,json=stateSnapshot,proto3,oneof"`
+}
+
+type StateInfoSnapshot struct {
+	Elements             []*Envelope `protobuf:"bytes,1,rep,name=elements,proto3" json:"elements,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
+}
+```
+{% endcode-tabs-item %}
+{% endcode-tabs %}
+
+### 节点状态信息集合请求消息
+
+节点通过这个消息向通道内其它节点请求对方的状态消息集合
+
+{% code-tabs %}
+{% code-tabs-item title="protos/gossip/message.pb.go" %}
+```go
+type GossipMessage_StateInfoPullReq struct {
+	StateInfoPullReq *StateInfoPullRequest `protobuf:"bytes,17,opt,name=state_info_pull_req,json=stateInfoPullReq,proto3,oneof"`
+}
+
+type StateInfoPullRequest struct {
+	// channel_MAC is an authentication code that proves
+	// that the peer that sent this message knows
+	// the name of the channel.
+	Channel_MAC          []byte   `protobuf:"bytes,1,opt,name=channel_MAC,json=channelMAC,proto3" json:"channel_MAC,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+```
+{% endcode-tabs-item %}
+{% endcode-tabs %}
+
