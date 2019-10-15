@@ -17,6 +17,7 @@
 
 ## 许可管理
 
+* [证书](xu-ke-guan-li/zheng-shu.md)
 * [组织联盟](xu-ke-guan-li/zu-zhi-lian-meng.md)
 * [策略](xu-ke-guan-li/ce-lve.md)
 
