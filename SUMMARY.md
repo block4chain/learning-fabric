@@ -15,6 +15,11 @@
 
 * [什么是区块链](qu-kuai-lian/qu-kuai-block.md)
 
+## 许可管理
+
+* [组织联盟](xu-ke-guan-li/zu-zhi-lian-meng.md)
+* [策略](xu-ke-guan-li/ce-lve.md)
+
 ## 链码\(Chaincode\)
 
 * [概述](lian-ma-chaincode/gai-shu.md)
