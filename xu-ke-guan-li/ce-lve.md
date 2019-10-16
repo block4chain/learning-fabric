@@ -36,7 +36,7 @@ OR('SampleOrg.member', 'SampleOrg2.peer')
 示例:  MAJORITY Admins
 ```
 
-### Signature策略
+## Signature策略
 
 Signature策略定义如下:
 
