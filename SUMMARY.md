@@ -21,6 +21,10 @@
 * [组织联盟](xu-ke-guan-li/zu-zhi-lian-meng.md)
 * [策略](xu-ke-guan-li/ce-lve.md)
 
+## 交易和区块
+
+* [创世块](jiao-yi-he-qu-kuai/chuang-shi-kuai.md)
+
 ## 链码\(Chaincode\)
 
 * [概述](lian-ma-chaincode/gai-shu.md)
