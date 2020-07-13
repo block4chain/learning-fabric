@@ -11,10 +11,6 @@
 * [一次事务的交互流程](ruan-jian-jia-gou-he-dai-ma-jie-gou/yi-ci-shi-wu-de-jiao-hu-liu-cheng.md)
 * [源代码目录结构](ruan-jian-jia-gou-he-dai-ma-jie-gou/yuan-dai-ma-mu-lu-jie-gou.md)
 
-## 区块链
-
-* [什么是区块链](qu-kuai-lian/qu-kuai-block.md)
-
 ## 许可管理
 
 * [证书](xu-ke-guan-li/zheng-shu.md)
