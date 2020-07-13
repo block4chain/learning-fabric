@@ -43,6 +43,16 @@ Cluster:
 ### 创世块
 
 ```yaml
+Organizations:
+
+    # SampleOrg defines an MSP using the sampleconfig. It should never be used
+    # in production but may be used as a template for other definitions.
+    - &SampleOrg
+        # OrdererEndpoints is a list of all orderers this org runs which clients
+        # and peers may to connect to to push transactions and receive blocks respectively.
+        OrdererEndpoints:
+            - "127.0.0.1:7050"
+            
 #### orderer type configuration
 SampleDevModeEtcdRaft:
         <<: *ChannelDefaults
