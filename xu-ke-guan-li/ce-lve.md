@@ -40,8 +40,8 @@ OR('SampleOrg.member', 'SampleOrg2.peer')
 
 Signature策略定义如下:
 
-{% code-tabs %}
-{% code-tabs-item title="protos/common/policies.pb.go" %}
+{% tabs %}
+{% tab title="protos/common/policies.pb.go" %}
 ```go
 type SignaturePolicyEnvelope struct {
 	Version              int32               `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
@@ -62,9 +62,9 @@ type SignaturePolicy struct {
 	XXX_sizecache        int32                  `json:"-"`
 }
 ```
-{% endcode-tabs-item %}
+{% endtab %}
 
-{% code-tabs-item title="SignaturePolicy\_NOutOf\_ struct" %}
+{% tab title="SignaturePolicy\_NOutOf\_ struct" %}
 ```go
 type SignaturePolicy_NOutOf_ struct {
 	NOutOf *SignaturePolicy_NOutOf `protobuf:"bytes,2,opt,name=n_out_of,json=nOutOf,proto3,oneof"`
@@ -77,16 +77,16 @@ type SignaturePolicy_NOutOf struct {
 	XXX_sizecache        int32              `json:"-"`
 }
 ```
-{% endcode-tabs-item %}
+{% endtab %}
 
-{% code-tabs-item title="SignaturePolicy\_SignedBy " %}
+{% tab title="SignaturePolicy\_SignedBy " %}
 ```go
 type SignaturePolicy_SignedBy struct {
 	SignedBy int32 `protobuf:"varint,1,opt,name=signed_by,json=signedBy,proto3,oneof"`
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endtab %}
+{% endtabs %}
 
 
 

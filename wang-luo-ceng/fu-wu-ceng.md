@@ -6,8 +6,7 @@ description: 服务层实现Gossip协议，并为上层提供节点发现、数�
 
 ## 服务定义
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/gossip/gossip.go" %}
+{% code title="gossip/gossip/gossip.go" %}
 ```go
 type Gossip interface {
 	//channel相关
@@ -36,8 +35,7 @@ type Gossip interface {
 	Stop()
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ## 服务实现
 

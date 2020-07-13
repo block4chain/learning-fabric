@@ -8,8 +8,7 @@ description: 通信层维护底层的GRPC连接，处理数据的接收和发送
 
 通信层提供一个GRPC服务，定义如下:
 
-{% code-tabs %}
-{% code-tabs-item title="protos/gossip/message.pb.go" %}
+{% code title="protos/gossip/message.pb.go" %}
 ```go
 // GossipServer is the server API for Gossip service.
 type GossipServer interface {
@@ -19,8 +18,7 @@ type GossipServer interface {
 	Ping(context.Context, *Empty) (*Empty, error)
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 同时通信层提供一个抽象接口方便上层应用使用
 
@@ -49,8 +47,7 @@ type Comm interface {
 
 `comm.commImpl`是通信层服务的实现
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/comm/comm\_impl.go" %}
+{% code title="gossip/comm/comm\_impl.go" %}
 ```go
 type commImpl struct {
 	sa             api.SecurityAdvisor
@@ -77,13 +74,11 @@ type commImpl struct {
 	sendBuffSize   int
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### `GossipStream`方法
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/comm/comm\_impl.go" %}
+{% code title="gossip/comm/comm\_impl.go" %}
 ```go
 func (c *commImpl) GossipStream(stream proto.Gossip_GossipStreamServer) error {
 	if c.isStopping() {
@@ -116,20 +111,17 @@ func (c *commImpl) GossipStream(stream proto.Gossip_GossipStreamServer) error {
 	return conn.serviceConnection()
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### `Ping`方法
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/comm/comm\_impl.go" %}
+{% code title="gossip/comm/comm\_impl.go" %}
 ```go
 func (c *commImpl) Ping(context.Context, *proto.Empty) (*proto.Empty, error) {
 	return &proto.Empty{}, nil
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### 其它方法
 
@@ -160,8 +152,7 @@ Fabric网络中的节点间可以建立点对点连接，在建立连接前需�
 
 握手时一个节点与另外一个节点建立GRPC连接，在双方交换身份信息前，发起方会通过Ping命令检测对方是否在线。
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/comm/comm\_impl.go" %}
+{% code title="gossip/comm/comm\_impl.go" %}
 ```go
 func (c *commImpl) Handshake(remotePeer *RemotePeer) (api.PeerIdentityType, error) {
 	var dialOpts []grpc.DialOption
@@ -204,13 +195,11 @@ func (c *commImpl) Handshake(remotePeer *RemotePeer) (api.PeerIdentityType, erro
 	return connInfo.Identity, nil
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 在确认对方在线后，双方互相发送一个[连接建立消息](https://app.gitbook.com/@me020523/s/fabric/~/drafts/-LqoydU-0k79xp9FJWFw/primary/wang-luo-ceng/gossip-xie-yi#lian-jie-jian-li-xiao-xi)，消息中包含身份信息，在收到对方的身份信息后，节点会对身份信息进行检验。
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/comm/comm\_impl.go" %}
+{% code title="gossip/comm/comm\_impl.go" %}
 ```go
 func (c *commImpl) authenticateRemotePeer(stream stream, initiator bool) (*proto.ConnectionInfo, error) {
 	ctx := stream.Context()
@@ -286,8 +275,7 @@ func (c *commImpl) authenticateRemotePeer(stream stream, initiator bool) (*proto
 	return connInfo, nil
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 节点身份验证通过后，双方握手成功。连接握手的目的是为了对远端节点的身份进行确认。
 
@@ -297,8 +285,7 @@ func (c *commImpl) authenticateRemotePeer(stream stream, initiator bool) (*proto
 
 Fabric网络中的每一个节点都有一个唯一标识: _**PKIID**_.
 
-{% code-tabs %}
-{% code-tabs-item title="peer/gossip/mcs.go" %}
+{% code title="peer/gossip/mcs.go" %}
 ```go
 func (s *MSPMessageCryptoService) GetPKIidOfCert(peerIdentity api.PeerIdentityType) common.PKIidType {
 	// Validate arguments
@@ -325,8 +312,7 @@ func (s *MSPMessageCryptoService) GetPKIidOfCert(peerIdentity api.PeerIdentityTy
 	return digest
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 PKIID是节点身份和节点MSP ID的sha256 hash值。
 
@@ -334,8 +320,7 @@ PKIID是节点身份和节点MSP ID的sha256 hash值。
 
 两个节点握手成功后，节点会将对方PKIID和对方身份存放在`identity.Mapper`中，方便后续使用。`identity.Mapper`是一个接口，定义如下:
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/identity/identity.go" %}
+{% code title="gossip/identity/identity.go" %}
 ```go
 type Mapper interface {
 	Put(pkiID common.PKIidType, identity api.PeerIdentityType) error
@@ -348,13 +333,11 @@ type Mapper interface {
 	Stop()
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 该接口存在一个唯一实现`identity.identityMapperImpl`
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/identity/identity.go" %}
+{% code title="gossip/identity/identity.go" %}
 ```go
 type identityMapperImpl struct {
 	onPurge    purgeTrigger
@@ -375,8 +358,7 @@ type storedIdentity struct {
 	expirationTimer *time.Timer  //身份过期计时器
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### 身份清理
 
@@ -384,8 +366,7 @@ type storedIdentity struct {
 
 新建`identity.identityMapperImpl`实例时，peer节点会启动一个goroutine定期清理身份
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/identity/identity.go" %}
+{% code title="gossip/identity/identity.go" %}
 ```go
 func NewIdentityMapper(mcs api.MessageCryptoService, selfIdentity api.PeerIdentityType, onPurge purgeTrigger, sa api.SecurityAdvisor) Mapper {
 	//....
@@ -408,8 +389,7 @@ func (is *identityMapperImpl) periodicalPurgeUnusedIdentities() {
 	}
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 清理身份的goroutine会定期按规则选择出待清理的身份:
 
@@ -474,8 +454,7 @@ func (is *identityMapperImpl) Put(pkiID common.PKIidType, identity api.PeerIdent
 
 结构体`comm.connectionStore`管理节点双方建立的连接
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/comm/conn.go" %}
+{% code title="gossip/comm/conn.go" %}
 ```go
 type ConnConfig struct {
 	RecvBuffSize int  //接收缓冲区大小，默认值为20，配置文件peer.gossip.recvBuffSize值
@@ -506,8 +485,7 @@ func (cs *connectionStore) onConnected(serverStream proto.Gossip_GossipStreamSer
 func (cs *connectionStore) registerConn(connInfo *proto.ConnectionInfo,
 	serverStream proto.Gossip_GossipStreamServer, metrics *metrics.CommMetrics) *connection
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 当节点间握手通过后，会通过`connectionStore.onConnected`通知`connectionStore`建立双方的连接
 
@@ -523,8 +501,7 @@ func (c *commImpl) GossipStream(stream proto.Gossip_GossipStreamServer) error {
 
 `comm.connection`代表节点之间的一个连接
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/comm/conn.go" %}
+{% code title="gossip/comm/conn.go" %}
 ```go
 type connection struct {
 	recvBuffSize int  //接收缓冲区大小
@@ -558,8 +535,7 @@ func (conn *connection) readFromStream(errChan chan error, quit chan struct{}, m
 //获取连接的stream
 func (conn *connection) getStream() stream
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### 发送与接收消息
 
@@ -736,8 +712,7 @@ func (conn *connection) serviceConnection() error {
 
 通信层并不直接处理消息，而是在处理消息时把消息广播给所有感兴趣的订阅者。通信层通过`comm.ChannelDeMultiplexer`结构完成
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/comm/demux.go" %}
+{% code title="gossip/comm/demux.go" %}
 ```go
 type MessageAcceptor func(interface{}) bool  //消息过滤器
 type channel struct {
@@ -756,8 +731,7 @@ func (m *ChannelDeMultiplexer) Close()
 //广播消息
 func (m *ChannelDeMultiplexer) DeMultiplex(msg interface{})
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### 注册订阅
 
@@ -897,8 +871,7 @@ func (c *commImpl) SendWithAck(msg *proto.SignedGossipMessage, timeout time.Dura
 
 方法将操作委托给结构`comm.ackSendOperation`
 
-{% code-tabs %}
-{% code-tabs-item title="gossip/comm/ack.go" %}
+{% code title="gossip/comm/ack.go" %}
 ```go
 type sendFunc func(peer *RemotePeer, msg *proto.SignedGossipMessage)
 type waitFunc func(*RemotePeer) error
@@ -908,8 +881,7 @@ type ackSendOperation struct {
 	waitForAck waitFunc
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 并执行结构实例的send方法
 

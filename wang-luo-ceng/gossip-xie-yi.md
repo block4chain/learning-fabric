@@ -10,8 +10,8 @@ Gossip节点间通过一个消息协议完成数据交换，根据消息是否�
 
 * **原始消息协议**
 
-{% code-tabs %}
-{% code-tabs-item title="protos/gossip/message.pb.go" %}
+{% tabs %}
+{% tab title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage struct {
 	//暂未使用
@@ -26,9 +26,9 @@ type GossipMessage struct {
 	XXX_sizecache        int32                   `json:"-"`
 }
 ```
-{% endcode-tabs-item %}
+{% endtab %}
 
-{% code-tabs-item title="protos/gossip/message.pb" %}
+{% tab title="protos/gossip/message.pb" %}
 ```c
 message GossipMessage {
     uint64 nonce  = 1;
@@ -102,22 +102,22 @@ message GossipMessage {
     }
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endtab %}
+{% endtabs %}
 
 * **已签名消息协议**
 
-{% code-tabs %}
-{% code-tabs-item title="protos/gossip/extensions.go" %}
+{% tabs %}
+{% tab title="protos/gossip/extensions.go" %}
 ```go
 type SignedGossipMessage struct {
 	*Envelope
 	*GossipMessage
 }
 ```
-{% endcode-tabs-item %}
+{% endtab %}
 
-{% code-tabs-item title="protos/gossip/message.pb.go" %}
+{% tab title="protos/gossip/message.pb.go" %}
 ```go
 type Envelope struct {
 	Payload              []byte          `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
@@ -136,15 +136,14 @@ type SecretEnvelope struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endtab %}
+{% endtabs %}
 
 ## 消息签名
 
 为了保证消息没有被篡改需要对消息进行签名，签名实现方法如下:
 
-{% code-tabs %}
-{% code-tabs-item title="protos/gossip/extensions.go" %}
+{% code title="protos/gossip/extensions.go" %}
 ```go
 func (m *SignedGossipMessage) Sign(signer Signer) (*Envelope, error) {
 	var secretEnvelope *SecretEnvelope
@@ -170,8 +169,7 @@ func (m *SignedGossipMessage) Sign(signer Signer) (*Envelope, error) {
 	return e, nil
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ## 消息内容
 
@@ -181,8 +179,7 @@ func (m *SignedGossipMessage) Sign(signer Signer) (*Envelope, error) {
 
 ACK消息用于对接收到的消息进行确认回复
 
-{% code-tabs %}
-{% code-tabs-item title="protos/gossip/message.pb.go" %}
+{% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_Ack struct {
 	Ack *Acknowledgement `protobuf:"bytes,22,opt,name=ack,proto3,oneof"`
@@ -195,15 +192,13 @@ type Acknowledgement struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### 连接建立消息
 
 连接建立消息用于在节点间建立Gossip点对点连接
 
-{% code-tabs %}
-{% code-tabs-item title="protos/gossip/message.pb.go" %}
+{% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_Conn struct {
 	Conn *ConnEstablish `protobuf:"bytes,14,opt,name=conn,proto3,oneof"`
@@ -217,8 +212,7 @@ type ConnEstablish struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### 节点状态消息
 
@@ -228,8 +222,7 @@ type ConnEstablish struct {
 * 是否离开通道
 * 安装的链码集合
 
-{% code-tabs %}
-{% code-tabs-item title="protos/gossip/message.pb.go" %}
+{% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_StateInfo struct {
 	StateInfo *StateInfo `protobuf:"bytes,15,opt,name=state_info,json=stateInfo,proto3,oneof"`
@@ -253,15 +246,13 @@ type Properties struct {
 	XXX_sizecache        int32        `json:"-"`
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### 节点状态信息集合消息
 
 节点通过这个消息向通道内其它节点广播自己从网络上学习到的其它节点的状态信息集合
 
-{% code-tabs %}
-{% code-tabs-item title="protos/gossip/message.pb.go" %}
+{% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_StateSnapshot struct {
 	StateSnapshot *StateInfoSnapshot `protobuf:"bytes,16,opt,name=state_snapshot,json=stateSnapshot,proto3,oneof"`
@@ -274,15 +265,13 @@ type StateInfoSnapshot struct {
 	XXX_sizecache        int32       `json:"-"`
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 
 ### 节点状态信息集合请求消息
 
 节点通过这个消息向通道内其它节点请求对方的状态消息集合
 
-{% code-tabs %}
-{% code-tabs-item title="protos/gossip/message.pb.go" %}
+{% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_StateInfoPullReq struct {
 	StateInfoPullReq *StateInfoPullRequest `protobuf:"bytes,17,opt,name=state_info_pull_req,json=stateInfoPullReq,proto3,oneof"`
@@ -298,6 +287,5 @@ type StateInfoPullRequest struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endcode %}
 

@@ -25,6 +25,10 @@
 
 * [创世块](jiao-yi-he-qu-kuai/chuang-shi-kuai.md)
 
+## 共识
+
+* [Raft](gong-shi/raft.md)
+
 ## 链码\(Chaincode\)
 
 * [概述](lian-ma-chaincode/gai-shu.md)

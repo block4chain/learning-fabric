@@ -17,16 +17,16 @@
 
 * 交易的ChannelHeader初始化代码:
 
-{% code-tabs %}
-{% code-tabs-item title="common/genesis/genesis.go" %}
+{% tabs %}
+{% tab title="common/genesis/genesis.go" %}
 ```go
 //创建创世区块ChannelHeader
 //msgVersion: 0, channelId: 系统通道ID， epoch: 0
 payloadChannelHeader := utils.MakeChannelHeader(cb.HeaderType_CONFIG, msgVersion, channelID, epoch)
 ```
-{% endcode-tabs-item %}
+{% endtab %}
 
-{% code-tabs-item title="protos/utils/commonutils.go" %}
+{% tab title="protos/utils/commonutils.go" %}
 ```go
 func MakeChannelHeader(headerType cb.HeaderType, version int32, chainID string, epoch uint64) *cb.ChannelHeader {
 	return &cb.ChannelHeader{
@@ -41,8 +41,8 @@ func MakeChannelHeader(headerType cb.HeaderType, version int32, chainID string, 
 	}
 }
 ```
-{% endcode-tabs-item %}
-{% endcode-tabs %}
+{% endtab %}
+{% endtabs %}
 
 ### 交易数据
 
