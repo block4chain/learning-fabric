@@ -10,31 +10,15 @@ description: 基于Raft的共识方式
 
 ```yaml
 Cluster:
-        # SendBufferSize is the maximum number of messages in the egress buffer.
-        # Consensus messages are dropped if the buffer is full, and transaction
-        # messages are waiting for space to be freed.
+        ReplicationMaxRetries: 12 # 块拉取失败重试次数，默认12.
+        ReplicationRetryTimeout: 5e6 #块拉取重试间隔时间, 默认5s，单位纳秒
         SendBufferSize: 10
-        # ClientCertificate governs the file location of the client TLS certificate
-        # used to establish mutual TLS connections with other ordering service nodes.
         ClientCertificate:
-        # ClientPrivateKey governs the file location of the private key of the client TLS certificate.
         ClientPrivateKey:
-        # The below 4 properties should be either set together, or be unset together.
-        # If they are set, then the orderer node uses a separate listener for intra-cluster
-        # communication. If they are unset, then the general orderer listener is used.
-        # This is useful if you want to use a different TLS server certificates on the
-        # client-facing and the intra-cluster listeners.
-
-        # ListenPort defines the port on which the cluster listens to connections.
         ListenPort:
-        # ListenAddress defines the IP on which to listen to intra-cluster communication.
         ListenAddress:
-        # ServerCertificate defines the file location of the server TLS certificate used for intra-cluster
-        # communication.
         ServerCertificate:
-        # ServerPrivateKey defines the file location of the private key of the TLS certificate.
         ServerPrivateKey:
-        # RootCAs defines the file locations of the root cas of clients and servers
         RootCAs:
         - ""
         
