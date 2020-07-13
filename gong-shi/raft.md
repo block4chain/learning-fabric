@@ -10,8 +10,8 @@ description: 基于Raft的共识方式
 
 ```yaml
 Cluster:
-        ReplicationMaxRetries: 12 # 块拉取失败重试次数，默认12.
-        ReplicationRetryTimeout: 5e6 #块拉取重试间隔时间, 默认5s，单位纳秒
+        ReplicationMaxRetries: 12 # 副本失败重试次数，默认12.
+        ReplicationRetryTimeout: 5e6 #副本重试间隔时间, 默认5s，单位纳秒
         SendBufferSize: 10
         ClientCertificate:
         ClientPrivateKey:
