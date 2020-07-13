@@ -23,6 +23,7 @@
 
 ## 共识
 
+* [Orderer节点](gong-shi/orderer-jie-dian.md)
 * [Raft](gong-shi/raft.md)
 
 ## 链码\(Chaincode\)
