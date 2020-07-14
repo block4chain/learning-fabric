@@ -47,7 +47,13 @@ SampleDevModeEtcdRaft:
                 - <<: *SampleOrg
 #### etcd raft configuration   
 Orderer: &OrdererDefaults
-
+    # Addresses used to be the list of orderer addresses that clients and peers
+    # could connect to.  However, this does not allow clients to associate orderer
+    # addresses and orderer organizations which can be useful for things such
+    # as TLS validation.  The preferred way to specify orderer addresses is now
+    # to include the OrdererEndpoints item in your org definition
+    Addresses:
+        # - 127.0.0.1:7050
     # Orderer Type: The orderer implementation to start.
     # Available types are "solo", "kafka" and "etcdraft".
     OrdererType: etcdraft        
