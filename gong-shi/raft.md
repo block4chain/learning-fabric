@@ -141,3 +141,11 @@ message SeekInfo {
 }
 ```
 
+## 初始化
+
+### Channel发现
+
+1. 从所有已知的orderer中找出满足条件:$$BlockNumber(last) \ge b $$ 的orderer，并随机选择一个 $$B$$ 并建立grpc连接。
+2. 以本地的config block块号为基准块号 $$n$$ ，从 $$B$$ 同步所有 $$blocknum \le n$$ 的块
+3. 从刚同步的所有块中找出创建channel的congfig block，每一个这种block对应一个channel.
+4. 
