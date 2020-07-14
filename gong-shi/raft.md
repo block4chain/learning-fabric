@@ -43,8 +43,15 @@ SampleDevModeEtcdRaft:
         Orderer:
             <<: *OrdererDefaults
             OrdererType: etcdraft
-#### etcd raft configuration           
-EtcdRaft:
+            Organizations:
+                - <<: *SampleOrg
+#### etcd raft configuration   
+Orderer: &OrdererDefaults
+
+    # Orderer Type: The orderer implementation to start.
+    # Available types are "solo", "kafka" and "etcdraft".
+    OrdererType: etcdraft        
+    EtcdRaft:
         # The set of Raft replicas for this network. For the etcd/raft-based
         # implementation, we expect every replica to also be an OSN. Therefore,
         # a subset of the host:port items enumerated in this list should be
