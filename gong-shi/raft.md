@@ -143,6 +143,32 @@ message SeekInfo {
 
 ## 初始化
 
+### 服务监听
+
+```go
+// 根据配置项和是否启用tls决定是否复用端口
+clusterConf := conf.General.Cluster
+	// If listen address is not configured, and the TLS certificate isn't configured,
+	// it means we use the general listener of the node.
+	if clusterConf.ListenPort == 0 && clusterConf.ServerCertificate == "" && clusterConf.ListenAddress == "" && clusterConf.ServerPrivateKey == "" {
+		logger.Info("Cluster listener is not configured, defaulting to use the general listener on port", conf.General.ListenPort)
+
+		if !conf.General.TLS.Enabled {
+			logger.Panicf("TLS is required for running ordering nodes of type %s.", typ)
+		}
+
+		return true
+	}
+
+	// Else, one of the above is defined, so all 4 properties should be defined.
+	if clusterConf.ListenPort == 0 || clusterConf.ServerCertificate == "" || clusterConf.ListenAddress == "" || clusterConf.ServerPrivateKey == "" {
+		logger.Panic("Options: General.Cluster.ListenPort, General.Cluster.ListenAddress, General.Cluster.ServerCertificate," +
+			" General.Cluster.ServerPrivateKey, should be defined altogether.")
+	}
+
+	return false
+```
+
 ### Channel发现
 
 1. 从所有已知的orderer中找出满足条件:$$BlockNumber(last) \ge b $$ 的orderer，并随机选择一个 $$B$$ 并建立grpc连接。
