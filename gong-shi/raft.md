@@ -149,4 +149,5 @@ message SeekInfo {
 2. 以本地的config block块号为基准块号 $$n$$ ，从 $$B$$ 同步所有 $$blocknum \le n$$ 的块
 3. 从刚同步的所有块中找出创建channel的congfig block，每一个这种block对应一个channel.
 4. 遍历所有发现的channel，并从网络中获取channel最新的config block，根据block中的共识信息确认当前节点是否包含在channel中.
+5. 为所有发现的channel在本地创建账本，并同步已经加入的channel中的所有块。
 
