@@ -142,6 +142,43 @@ message SeekInfo {
 }
 ```
 
+### Step消息
+
+```text
+message StepRequest {
+    oneof payload {
+        // consensus_request is a consensus specific message.
+        ConsensusRequest consensus_request = 1;
+        // submit_request is a relay of a transaction.
+        SubmitRequest submit_request = 2;
+    }
+}
+```
+
+#### 交易提交
+
+```text
+message SubmitRequest {
+    string channel = 1;
+    // last_validation_seq denotes the last
+    // configuration sequence at which the
+    // sender validated this message.
+    uint64 last_validation_seq = 2;
+    // content is the fabric transaction
+    // that is forwarded to the cluster member.
+    common.Envelope payload = 3;
+}
+```
+
+#### 交易共识
+
+```text
+message ConsensusRequest {
+    string channel = 1;
+    bytes payload = 2;
+}
+```
+
 ## 初始化
 
 ### 服务监听
