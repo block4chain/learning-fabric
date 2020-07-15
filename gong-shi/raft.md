@@ -239,3 +239,48 @@ type Chain interface {
 }
 ```
 
+### Channel发现
+
+#### 已有channel
+
+在orderer启动时，遍历数据目录发现已有channel，并同步到共识层
+
+```go
+r.consenters = consenters
+existingChains := r.ledgerFactory.ChainIDs()
+
+for _, chainID := range existingChains {
+    //....
+    if _, ok := ledgerResources.ConsortiumsConfig(); ok {
+        //系统链....
+    }else{
+      chain := newChainSupport(
+				r,
+				ledgerResources,
+				r.consenters,
+				r.signer,
+				r.blockcutterMetrics,
+			)
+			r.chains[chainID] = chain
+			chain.start()
+    }
+}
+```
+
+#### 新建channel
+
+在存储block，如果是一个新建channel block，则创建channel并同步到共识层
+
+```go
+switch chdr.Type {
+	case int32(cb.HeaderType_ORDERER_TRANSACTION):
+		newChannelConfig, err := utils.UnmarshalEnvelope(payload.Data)
+		if err != nil {
+			logger.Panicf("Told to write a config block with new channel, but did not have config update embedded: %s", err)
+		}
+		bw.registrar.newChain(newChannelConfig)
+}
+```
+
+
+
