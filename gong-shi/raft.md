@@ -293,7 +293,7 @@ orderer收到客户端的广播请求后:
 
 ### 共识流程
 
-
+![](../.gitbook/assets/selection_041.png)
 
 
 
