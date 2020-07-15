@@ -284,3 +284,12 @@ switch chdr.Type {
 
 加载已有channel和新建channel最终会调用`Consenter.HandleChain`通知共识层
 
+### 交易处理
+
+orderer收到客户端的广播请求后: 
+
+1. 等待共识层结束上一次交易，准备接受新的交易
+2. 执行共识
+
+
+
