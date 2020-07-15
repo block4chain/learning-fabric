@@ -282,5 +282,5 @@ switch chdr.Type {
 }
 ```
 
-
+加载已有channel最终会调用`Consenter.HandleChain`通知共识层
 
