@@ -215,3 +215,27 @@ clusterConf := conf.General.Cluster
 4. 遍历所有发现的channel，并从网络中获取channel最新的config block，根据block中的共识信息确认当前节点是否包含在channel中.
 5. 为所有发现的channel在本地创建账本，并同步已经加入的channel中的所有块。
 
+## 共识
+
+### 接口协议
+
+```go
+type Consenter interface {
+	HandleChain(support ConsenterSupport, metadata *cb.Metadata) (Chain, error)
+}
+
+type Chain interface {
+	Order(env *cb.Envelope, configSeq uint64) error
+
+	Configure(config *cb.Envelope, configSeq uint64) error
+
+	WaitReady() error
+
+	Errored() <-chan struct{}
+
+	Start()
+
+	Halt()
+}
+```
+
