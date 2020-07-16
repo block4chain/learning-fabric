@@ -10,15 +10,27 @@ description: 基于Raft的共识方式
 
 一个单调递增的计数器，在每次发生领导选举时递增
 
-### 节点状态
+### 节点角色
 
-Raft协议中副本节点可能处于的状态:
+Raft协议中副本节点可能处于的角色:
 
 * Leader
 * Follower
 * Candidate
 
 ![](../.gitbook/assets/raft-state-trans.webp)
+
+### 领导选举
+
+#### 触发时机:
+
+发生选举超时\(Election timeout\)后，节点进入领导选举周期。
+
+选举超时是一个节点从Follower变成一个Candidate所需要等待的时间。一般在150ms到300ms之间随机\(随机是为了尽量避免产生多个candidate，给选主过程制造麻烦\)。
+
+Follow在收到Leader合法的Append Entries消息后会重置选举超时。
+
+
 
 ## 配置
 
