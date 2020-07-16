@@ -10,6 +10,16 @@ description: 基于Raft的共识方式
 
 一个单调递增的计数器，在每次发生领导选举时递增
 
+### 节点状态
+
+#### 持久状态
+
+![](../.gitbook/assets/image.png)
+
+#### WAL日志
+
+![](../.gitbook/assets/image%20%282%29.png)
+
 ### 节点角色
 
 Raft协议中副本节点可能处于的角色:
@@ -20,13 +30,35 @@ Raft协议中副本节点可能处于的角色:
 
 ![](../.gitbook/assets/raft-state-trans.webp)
 
+#### Follower功能
+
+![](../.gitbook/assets/image%20%288%29.png)
+
+#### Candidate功能
+
+![](../.gitbook/assets/image%20%286%29.png)
+
+#### Leader功能
+
+![](../.gitbook/assets/image%20%283%29.png)
+
+### RPC
+
+#### RequestVote
+
+![](../.gitbook/assets/selection_042.png)
+
+#### AppendEntries
+
+![](../.gitbook/assets/selection_043.png)
+
 ### 领导选举
 
 #### 触发时机:
 
-发生选举超时\(Election timeout\)后，节点进入领导选举周期。
+发生选举超时\(Election timeout\)或者收到其他节点的RequestVote合法请求后，节点进入领导选举周期。
 
-选举超时是一个节点从Follower变成一个Candidate所需要等待的时间。一般在150ms到300ms之间随机\(随机是为了尽量避免产生多个candidate，给选主过程制造麻烦\)。
+选举超时是一个节点从Follower变成一个Candidate所需要等待的时间。一般在100ms到500ms之间随机\(随机是为了尽量避免产生多个candidate，给选主过程制造麻烦\)。
 
 Follow在收到Leader合法的Append Entries消息后会重置选举超时。
 
