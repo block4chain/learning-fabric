@@ -4,6 +4,18 @@ description: 基于Raft的共识方式
 
 # Raft
 
+## Raft协议
+
+### 节点状态
+
+Raft协议中副本节点可能处于的状态:
+
+* Leader
+* Follower
+* Candidate
+
+![](../.gitbook/assets/raft-state-trans.webp)
+
 ## 配置
 
 ### 配置文件
