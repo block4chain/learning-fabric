@@ -62,6 +62,16 @@ Raft协议中副本节点可能处于的角色:
 
 Follow在收到Leader合法的Append Entries消息后会重置选举超时。
 
+#### 选举流程
+
+1. 增加Term计数
+2. 变更为Candidate角色
+3. 投票给自己
+4. 向其他节点发送RequestVote请求
+   * 接收到大多数节点的赞成票: 变更为Leader角色，然后周期性发送AppendEntries消息
+   * 接受到其他Leader节点的有效消息: 变更为Follower角色
+   * 选举超时，重新发起选举流程。
+
 
 
 ## 配置
