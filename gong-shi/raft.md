@@ -72,6 +72,15 @@ Follow在收到Leader合法的Append Entries消息后会重置选举超时。
    * 接受到其他Leader节点的有效消息: 变更为Follower角色
    * 选举超时，重新发起选举流程。
 
+### 事务提交
+
+![](../.gitbook/assets/selection_049.png)
+
+1. 客户端向Leader提交一个是事务请求
+2. Leader将请求保存到本地WAL日志，然后像Follower发送AppendEntries请求。
+3. Leader收到大多数节点AppendEntries成功响应，执行事物请求完成状态迁移。
+4. Leader将事务执行后的结果响应给客户端。
+
 ## 配置
 
 ### 配置文件
@@ -90,7 +99,6 @@ Cluster:
         ServerPrivateKey:
         RootCAs:
         - ""
-        
 ```
 
 ### 创世块
@@ -105,7 +113,7 @@ Organizations:
         # and peers may to connect to to push transactions and receive blocks respectively.
         OrdererEndpoints:
             - "127.0.0.1:7050"
-            
+
 #### orderer type configuration
 SampleDevModeEtcdRaft:
         <<: *ChannelDefaults
@@ -254,30 +262,30 @@ message ConsensusRequest {
 ```go
 // 根据配置项和是否启用tls决定是否复用端口
 clusterConf := conf.General.Cluster
-	// If listen address is not configured, and the TLS certificate isn't configured,
-	// it means we use the general listener of the node.
-	if clusterConf.ListenPort == 0 && clusterConf.ServerCertificate == "" && clusterConf.ListenAddress == "" && clusterConf.ServerPrivateKey == "" {
-		logger.Info("Cluster listener is not configured, defaulting to use the general listener on port", conf.General.ListenPort)
+    // If listen address is not configured, and the TLS certificate isn't configured,
+    // it means we use the general listener of the node.
+    if clusterConf.ListenPort == 0 && clusterConf.ServerCertificate == "" && clusterConf.ListenAddress == "" && clusterConf.ServerPrivateKey == "" {
+        logger.Info("Cluster listener is not configured, defaulting to use the general listener on port", conf.General.ListenPort)
 
-		if !conf.General.TLS.Enabled {
-			logger.Panicf("TLS is required for running ordering nodes of type %s.", typ)
-		}
+        if !conf.General.TLS.Enabled {
+            logger.Panicf("TLS is required for running ordering nodes of type %s.", typ)
+        }
 
-		return true
-	}
+        return true
+    }
 
-	// Else, one of the above is defined, so all 4 properties should be defined.
-	if clusterConf.ListenPort == 0 || clusterConf.ServerCertificate == "" || clusterConf.ListenAddress == "" || clusterConf.ServerPrivateKey == "" {
-		logger.Panic("Options: General.Cluster.ListenPort, General.Cluster.ListenAddress, General.Cluster.ServerCertificate," +
-			" General.Cluster.ServerPrivateKey, should be defined altogether.")
-	}
+    // Else, one of the above is defined, so all 4 properties should be defined.
+    if clusterConf.ListenPort == 0 || clusterConf.ServerCertificate == "" || clusterConf.ListenAddress == "" || clusterConf.ServerPrivateKey == "" {
+        logger.Panic("Options: General.Cluster.ListenPort, General.Cluster.ListenAddress, General.Cluster.ServerCertificate," +
+            " General.Cluster.ServerPrivateKey, should be defined altogether.")
+    }
 
-	return false
+    return false
 ```
 
 ### Channel发现
 
-1. 从所有已知的orderer中找出满足条件:$$BlockNumber(last) \ge b $$ 的orderer，并随机选择一个 $$P$$ 并建立grpc连接。
+1. 从所有已知的orderer中找出满足条件:$$BlockNumber(last) \ge b$$ 的orderer，并随机选择一个 $$P$$ 并建立grpc连接。
 2. 以本地的config block块号为基准块号 $$n$$ ，从 $$P$$ 同步所有 $$blocknum \le n$$ 的块
 3. 从刚同步的所有块中找出创建channel的congfig block，每一个这种block对应一个channel.
 4. 遍历所有发现的channel，并从网络中获取channel最新的config block，根据block中的共识信息确认当前节点是否包含在channel中.
@@ -289,21 +297,21 @@ clusterConf := conf.General.Cluster
 
 ```go
 type Consenter interface {
-	HandleChain(support ConsenterSupport, metadata *cb.Metadata) (Chain, error)
+    HandleChain(support ConsenterSupport, metadata *cb.Metadata) (Chain, error)
 }
 
 type Chain interface {
-	Order(env *cb.Envelope, configSeq uint64) error
+    Order(env *cb.Envelope, configSeq uint64) error
 
-	Configure(config *cb.Envelope, configSeq uint64) error
+    Configure(config *cb.Envelope, configSeq uint64) error
 
-	WaitReady() error
+    WaitReady() error
 
-	Errored() <-chan struct{}
+    Errored() <-chan struct{}
 
-	Start()
+    Start()
 
-	Halt()
+    Halt()
 }
 ```
 
@@ -323,14 +331,14 @@ for _, chainID := range existingChains {
         //系统链....
     }else{
       chain := newChainSupport(
-				r,
-				ledgerResources,
-				r.consenters,
-				r.signer,
-				r.blockcutterMetrics,
-			)
-			r.chains[chainID] = chain
-			chain.start()
+                r,
+                ledgerResources,
+                r.consenters,
+                r.signer,
+                r.blockcutterMetrics,
+            )
+            r.chains[chainID] = chain
+            chain.start()
     }
 }
 ```
@@ -341,12 +349,12 @@ for _, chainID := range existingChains {
 
 ```go
 switch chdr.Type {
-	case int32(cb.HeaderType_ORDERER_TRANSACTION):
-		newChannelConfig, err := utils.UnmarshalEnvelope(payload.Data)
-		if err != nil {
-			logger.Panicf("Told to write a config block with new channel, but did not have config update embedded: %s", err)
-		}
-		bw.registrar.newChain(newChannelConfig)
+    case int32(cb.HeaderType_ORDERER_TRANSACTION):
+        newChannelConfig, err := utils.UnmarshalEnvelope(payload.Data)
+        if err != nil {
+            logger.Panicf("Told to write a config block with new channel, but did not have config update embedded: %s", err)
+        }
+        bw.registrar.newChain(newChannelConfig)
 }
 ```
 
@@ -354,7 +362,7 @@ switch chdr.Type {
 
 ### 交易处理
 
-orderer收到客户端的广播请求后: 
+orderer收到客户端的广播请求后:
 
 1. 等待共识层结束上一次交易，准备接受新的交易
 2. 执行共识
@@ -362,6 +370,4 @@ orderer收到客户端的广播请求后:
 ### 共识流程
 
 ![](../.gitbook/assets/selection_041.png)
-
-
 

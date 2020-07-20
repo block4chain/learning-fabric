@@ -14,16 +14,16 @@ Gossip节点间通过一个消息协议完成数据交换，根据消息是否�
 {% tab title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage struct {
-	//暂未使用
-	Nonce uint64 `protobuf:"varint,1,opt,name=nonce,proto3" json:"nonce,omitempty"`
-	Channel []byte `protobuf:"bytes,2,opt,name=channel,proto3" json:"channel,omitempty"`
-	//对消息进行标记，方便对消息进行差异化处理
-	Tag GossipMessage_Tag `protobuf:"varint,3,opt,name=tag,proto3,enum=gossip.GossipMessage_Tag" json:"tag,omitempty"`
-	//根据不同的使用场景，消息的负载内容可能不一样
-	Content              isGossipMessage_Content `protobuf_oneof:"content"`
-	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
-	XXX_unrecognized     []byte                  `json:"-"`
-	XXX_sizecache        int32                   `json:"-"`
+    //暂未使用
+    Nonce uint64 `protobuf:"varint,1,opt,name=nonce,proto3" json:"nonce,omitempty"`
+    Channel []byte `protobuf:"bytes,2,opt,name=channel,proto3" json:"channel,omitempty"`
+    //对消息进行标记，方便对消息进行差异化处理
+    Tag GossipMessage_Tag `protobuf:"varint,3,opt,name=tag,proto3,enum=gossip.GossipMessage_Tag" json:"tag,omitempty"`
+    //根据不同的使用场景，消息的负载内容可能不一样
+    Content              isGossipMessage_Content `protobuf_oneof:"content"`
+    XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+    XXX_unrecognized     []byte                  `json:"-"`
+    XXX_sizecache        int32                   `json:"-"`
 }
 ```
 {% endtab %}
@@ -42,7 +42,7 @@ message GossipMessage {
         CHAN_AND_ORG = 4;
         CHAN_OR_ORG  = 5;
     }
-    
+
     Tag tag = 3;
 
     oneof content {
@@ -111,8 +111,8 @@ message GossipMessage {
 {% tab title="protos/gossip/extensions.go" %}
 ```go
 type SignedGossipMessage struct {
-	*Envelope
-	*GossipMessage
+    *Envelope
+    *GossipMessage
 }
 ```
 {% endtab %}
@@ -120,20 +120,20 @@ type SignedGossipMessage struct {
 {% tab title="protos/gossip/message.pb.go" %}
 ```go
 type Envelope struct {
-	Payload              []byte          `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
-	Signature            []byte          `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
-	SecretEnvelope       *SecretEnvelope `protobuf:"bytes,3,opt,name=secret_envelope,json=secretEnvelope,proto3" json:"secret_envelope,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+    Payload              []byte          `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
+    Signature            []byte          `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
+    SecretEnvelope       *SecretEnvelope `protobuf:"bytes,3,opt,name=secret_envelope,json=secretEnvelope,proto3" json:"secret_envelope,omitempty"`
+    XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+    XXX_unrecognized     []byte          `json:"-"`
+    XXX_sizecache        int32           `json:"-"`
 }
 
 type SecretEnvelope struct {
-	Payload              []byte   `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
-	Signature            []byte   `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+    Payload              []byte   `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
+    Signature            []byte   `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
+    XXX_NoUnkeyedLiteral struct{} `json:"-"`
+    XXX_unrecognized     []byte   `json:"-"`
+    XXX_sizecache        int32    `json:"-"`
 }
 ```
 {% endtab %}
@@ -146,27 +146,27 @@ type SecretEnvelope struct {
 {% code title="protos/gossip/extensions.go" %}
 ```go
 func (m *SignedGossipMessage) Sign(signer Signer) (*Envelope, error) {
-	var secretEnvelope *SecretEnvelope
-	if m.Envelope != nil {
-		//待签名消息存在一个安全负载
-		secretEnvelope = m.Envelope.SecretEnvelope
-	}
-	m.Envelope = nil
-	payload, err := proto.Marshal(m.GossipMessage)  //对原始Gossip消息进行序列化
-	if err != nil {
-		return nil, err
-	}
-	sig, err := signer(payload)  //对序列化后的消息进行签名
-	if err != nil {
-		return nil, err
-	}
-	e := &Envelope{
-		Payload:        payload,
-		Signature:      sig,
-		SecretEnvelope: secretEnvelope,
-	}
-	m.Envelope = e
-	return e, nil
+    var secretEnvelope *SecretEnvelope
+    if m.Envelope != nil {
+        //待签名消息存在一个安全负载
+        secretEnvelope = m.Envelope.SecretEnvelope
+    }
+    m.Envelope = nil
+    payload, err := proto.Marshal(m.GossipMessage)  //对原始Gossip消息进行序列化
+    if err != nil {
+        return nil, err
+    }
+    sig, err := signer(payload)  //对序列化后的消息进行签名
+    if err != nil {
+        return nil, err
+    }
+    e := &Envelope{
+        Payload:        payload,
+        Signature:      sig,
+        SecretEnvelope: secretEnvelope,
+    }
+    m.Envelope = e
+    return e, nil
 }
 ```
 {% endcode %}
@@ -182,14 +182,14 @@ ACK消息用于对接收到的消息进行确认回复
 {% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_Ack struct {
-	Ack *Acknowledgement `protobuf:"bytes,22,opt,name=ack,proto3,oneof"`
+    Ack *Acknowledgement `protobuf:"bytes,22,opt,name=ack,proto3,oneof"`
 }
 
 type Acknowledgement struct {
-	Error                string   `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+    Error                string   `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
+    XXX_NoUnkeyedLiteral struct{} `json:"-"`
+    XXX_unrecognized     []byte   `json:"-"`
+    XXX_sizecache        int32    `json:"-"`
 }
 ```
 {% endcode %}
@@ -201,15 +201,15 @@ type Acknowledgement struct {
 {% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_Conn struct {
-	Conn *ConnEstablish `protobuf:"bytes,14,opt,name=conn,proto3,oneof"`
+    Conn *ConnEstablish `protobuf:"bytes,14,opt,name=conn,proto3,oneof"`
 }
 type ConnEstablish struct {
-	PkiId                []byte   `protobuf:"bytes,1,opt,name=pki_id,json=pkiId,proto3" json:"pki_id,omitempty"`
-	Identity             []byte   `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
-	TlsCertHash          []byte   `protobuf:"bytes,3,opt,name=tls_cert_hash,json=tlsCertHash,proto3" json:"tls_cert_hash,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+    PkiId                []byte   `protobuf:"bytes,1,opt,name=pki_id,json=pkiId,proto3" json:"pki_id,omitempty"`
+    Identity             []byte   `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
+    TlsCertHash          []byte   `protobuf:"bytes,3,opt,name=tls_cert_hash,json=tlsCertHash,proto3" json:"tls_cert_hash,omitempty"`
+    XXX_NoUnkeyedLiteral struct{} `json:"-"`
+    XXX_unrecognized     []byte   `json:"-"`
+    XXX_sizecache        int32    `json:"-"`
 }
 ```
 {% endcode %}
@@ -225,25 +225,25 @@ type ConnEstablish struct {
 {% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_StateInfo struct {
-	StateInfo *StateInfo `protobuf:"bytes,15,opt,name=state_info,json=stateInfo,proto3,oneof"`
+    StateInfo *StateInfo `protobuf:"bytes,15,opt,name=state_info,json=stateInfo,proto3,oneof"`
 }
 type StateInfo struct {
-	Timestamp *PeerTime `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	PkiId     []byte    `protobuf:"bytes,3,opt,name=pki_id,json=pkiId,proto3" json:"pki_id,omitempty"`
-	Channel_MAC          []byte      `protobuf:"bytes,4,opt,name=channel_MAC,json=channelMAC,proto3" json:"channel_MAC,omitempty"`
-	Properties           *Properties `protobuf:"bytes,5,opt,name=properties,proto3" json:"properties,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
+    Timestamp *PeerTime `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+    PkiId     []byte    `protobuf:"bytes,3,opt,name=pki_id,json=pkiId,proto3" json:"pki_id,omitempty"`
+    Channel_MAC          []byte      `protobuf:"bytes,4,opt,name=channel_MAC,json=channelMAC,proto3" json:"channel_MAC,omitempty"`
+    Properties           *Properties `protobuf:"bytes,5,opt,name=properties,proto3" json:"properties,omitempty"`
+    XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+    XXX_unrecognized     []byte      `json:"-"`
+    XXX_sizecache        int32       `json:"-"`
 }
 //状态属性
 type Properties struct {
-	LedgerHeight         uint64       `protobuf:"varint,1,opt,name=ledger_height,json=ledgerHeight,proto3" json:"ledger_height,omitempty"`
-	LeftChannel          bool         `protobuf:"varint,2,opt,name=left_channel,json=leftChannel,proto3" json:"left_channel,omitempty"`
-	Chaincodes           []*Chaincode `protobuf:"bytes,3,rep,name=chaincodes,proto3" json:"chaincodes,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
+    LedgerHeight         uint64       `protobuf:"varint,1,opt,name=ledger_height,json=ledgerHeight,proto3" json:"ledger_height,omitempty"`
+    LeftChannel          bool         `protobuf:"varint,2,opt,name=left_channel,json=leftChannel,proto3" json:"left_channel,omitempty"`
+    Chaincodes           []*Chaincode `protobuf:"bytes,3,rep,name=chaincodes,proto3" json:"chaincodes,omitempty"`
+    XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+    XXX_unrecognized     []byte       `json:"-"`
+    XXX_sizecache        int32        `json:"-"`
 }
 ```
 {% endcode %}
@@ -255,14 +255,14 @@ type Properties struct {
 {% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_StateSnapshot struct {
-	StateSnapshot *StateInfoSnapshot `protobuf:"bytes,16,opt,name=state_snapshot,json=stateSnapshot,proto3,oneof"`
+    StateSnapshot *StateInfoSnapshot `protobuf:"bytes,16,opt,name=state_snapshot,json=stateSnapshot,proto3,oneof"`
 }
 
 type StateInfoSnapshot struct {
-	Elements             []*Envelope `protobuf:"bytes,1,rep,name=elements,proto3" json:"elements,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
+    Elements             []*Envelope `protobuf:"bytes,1,rep,name=elements,proto3" json:"elements,omitempty"`
+    XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+    XXX_unrecognized     []byte      `json:"-"`
+    XXX_sizecache        int32       `json:"-"`
 }
 ```
 {% endcode %}
@@ -274,17 +274,17 @@ type StateInfoSnapshot struct {
 {% code title="protos/gossip/message.pb.go" %}
 ```go
 type GossipMessage_StateInfoPullReq struct {
-	StateInfoPullReq *StateInfoPullRequest `protobuf:"bytes,17,opt,name=state_info_pull_req,json=stateInfoPullReq,proto3,oneof"`
+    StateInfoPullReq *StateInfoPullRequest `protobuf:"bytes,17,opt,name=state_info_pull_req,json=stateInfoPullReq,proto3,oneof"`
 }
 
 type StateInfoPullRequest struct {
-	// channel_MAC is an authentication code that proves
-	// that the peer that sent this message knows
-	// the name of the channel.
-	Channel_MAC          []byte   `protobuf:"bytes,1,opt,name=channel_MAC,json=channelMAC,proto3" json:"channel_MAC,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+    // channel_MAC is an authentication code that proves
+    // that the peer that sent this message knows
+    // the name of the channel.
+    Channel_MAC          []byte   `protobuf:"bytes,1,opt,name=channel_MAC,json=channelMAC,proto3" json:"channel_MAC,omitempty"`
+    XXX_NoUnkeyedLiteral struct{} `json:"-"`
+    XXX_unrecognized     []byte   `json:"-"`
+    XXX_sizecache        int32    `json:"-"`
 }
 ```
 {% endcode %}

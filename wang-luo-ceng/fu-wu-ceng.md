@@ -9,30 +9,30 @@ description: 服务层实现Gossip协议，并为上层提供节点发现、数�
 {% code title="gossip/gossip/gossip.go" %}
 ```go
 type Gossip interface {
-	//channel相关
-	JoinChan(joinMsg api.JoinChannelMessage, chainID common.ChainID).
-	LeaveChan(chainID common.ChainID)
-	SelfChannelInfo(common.ChainID) *proto.SignedGossipMessage
-	UpdateLedgerHeight(height uint64, chainID common.ChainID)
-	UpdateChaincodes(chaincode []*proto.Chaincode, chainID common.ChainID)
-	PeerFilter(channel common.ChainID, messagePredicate api.SubChannelSelectionCriteria) (filter.RoutingFilter, error)
-	
-	//member相关
-	SelfMembershipInfo() discovery.NetworkMember
-	Peers() []discovery.NetworkMember
-	PeersOfChannel(common.ChainID) []discovery.NetworkMember
-	UpdateMetadata(metadata []byte)
-	SuspectPeers(s api.PeerSuspector)
-	IdentityInfo() api.PeerIdentitySet
-	
-	//消息
-	Send(msg *proto.GossipMessage, peers ...*comm.RemotePeer)
-	SendByCriteria(*proto.SignedGossipMessage, SendCriteria) error
-	Gossip(msg *proto.GossipMessage)
-	
-	//其它
-	Accept(acceptor common.MessageAcceptor, passThrough bool) (<-chan *proto.GossipMessage, <-chan proto.ReceivedMessage)
-	Stop()
+    //channel相关
+    JoinChan(joinMsg api.JoinChannelMessage, chainID common.ChainID).
+    LeaveChan(chainID common.ChainID)
+    SelfChannelInfo(common.ChainID) *proto.SignedGossipMessage
+    UpdateLedgerHeight(height uint64, chainID common.ChainID)
+    UpdateChaincodes(chaincode []*proto.Chaincode, chainID common.ChainID)
+    PeerFilter(channel common.ChainID, messagePredicate api.SubChannelSelectionCriteria) (filter.RoutingFilter, error)
+
+    //member相关
+    SelfMembershipInfo() discovery.NetworkMember
+    Peers() []discovery.NetworkMember
+    PeersOfChannel(common.ChainID) []discovery.NetworkMember
+    UpdateMetadata(metadata []byte)
+    SuspectPeers(s api.PeerSuspector)
+    IdentityInfo() api.PeerIdentitySet
+
+    //消息
+    Send(msg *proto.GossipMessage, peers ...*comm.RemotePeer)
+    SendByCriteria(*proto.SignedGossipMessage, SendCriteria) error
+    Gossip(msg *proto.GossipMessage)
+
+    //其它
+    Accept(acceptor common.MessageAcceptor, passThrough bool) (<-chan *proto.GossipMessage, <-chan proto.ReceivedMessage)
+    Stop()
 }
 ```
 {% endcode %}
@@ -62,6 +62,4 @@ type Gossip interface {
 ### 公开帐本
 
 ### 隐私状态
-
-
 

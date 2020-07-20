@@ -44,22 +44,22 @@ Signature策略定义如下:
 {% tab title="protos/common/policies.pb.go" %}
 ```go
 type SignaturePolicyEnvelope struct {
-	Version              int32               `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
-	Rule                 *SignaturePolicy    `protobuf:"bytes,2,opt,name=rule,proto3" json:"rule,omitempty"`
-	Identities           []*msp.MSPPrincipal `protobuf:"bytes,3,rep,name=identities,proto3" json:"identities,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
+    Version              int32               `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
+    Rule                 *SignaturePolicy    `protobuf:"bytes,2,opt,name=rule,proto3" json:"rule,omitempty"`
+    Identities           []*msp.MSPPrincipal `protobuf:"bytes,3,rep,name=identities,proto3" json:"identities,omitempty"`
+    XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+    XXX_unrecognized     []byte              `json:"-"`
+    XXX_sizecache        int32               `json:"-"`
 }
 
 type SignaturePolicy struct {
-	// Types that are valid to be assigned to Type:
-	//	*SignaturePolicy_SignedBy
-	//	*SignaturePolicy_NOutOf_
-	Type                 isSignaturePolicy_Type `protobuf_oneof:"Type"`
-	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
-	XXX_unrecognized     []byte                 `json:"-"`
-	XXX_sizecache        int32                  `json:"-"`
+    // Types that are valid to be assigned to Type:
+    //    *SignaturePolicy_SignedBy
+    //    *SignaturePolicy_NOutOf_
+    Type                 isSignaturePolicy_Type `protobuf_oneof:"Type"`
+    XXX_NoUnkeyedLiteral struct{}               `json:"-"`
+    XXX_unrecognized     []byte                 `json:"-"`
+    XXX_sizecache        int32                  `json:"-"`
 }
 ```
 {% endtab %}
@@ -67,14 +67,14 @@ type SignaturePolicy struct {
 {% tab title="SignaturePolicy\_NOutOf\_ struct" %}
 ```go
 type SignaturePolicy_NOutOf_ struct {
-	NOutOf *SignaturePolicy_NOutOf `protobuf:"bytes,2,opt,name=n_out_of,json=nOutOf,proto3,oneof"`
+    NOutOf *SignaturePolicy_NOutOf `protobuf:"bytes,2,opt,name=n_out_of,json=nOutOf,proto3,oneof"`
 }
 type SignaturePolicy_NOutOf struct {
-	N                    int32              `protobuf:"varint,1,opt,name=n,proto3" json:"n,omitempty"`
-	Rules                []*SignaturePolicy `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
+    N                    int32              `protobuf:"varint,1,opt,name=n,proto3" json:"n,omitempty"`
+    Rules                []*SignaturePolicy `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty"`
+    XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+    XXX_unrecognized     []byte             `json:"-"`
+    XXX_sizecache        int32              `json:"-"`
 }
 ```
 {% endtab %}
@@ -82,11 +82,9 @@ type SignaturePolicy_NOutOf struct {
 {% tab title="SignaturePolicy\_SignedBy " %}
 ```go
 type SignaturePolicy_SignedBy struct {
-	SignedBy int32 `protobuf:"varint,1,opt,name=signed_by,json=signedBy,proto3,oneof"`
+    SignedBy int32 `protobuf:"varint,1,opt,name=signed_by,json=signedBy,proto3,oneof"`
 }
 ```
 {% endtab %}
 {% endtabs %}
-
-
 
