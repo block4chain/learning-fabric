@@ -72,8 +72,6 @@ Follow在收到Leader合法的Append Entries消息后会重置选举超时。
    * 接受到其他Leader节点的有效消息: 变更为Follower角色
    * 选举超时，重新发起选举流程。
 
-
-
 ## 配置
 
 ### 配置文件
